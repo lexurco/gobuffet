@@ -1,0 +1,13 @@
+Basic usage:
+
+$ createuser myuser
+$ createdb -O myuser gobuffet
+$ export PGDATABASE=gobuffet
+$ psql < gobuffet.sql
+$ go build .
+$ ./gobuffet pw
+password:
+$ mkdir img
+$ ./gobuffet serve
+
+And go to http://admin:yourpassword@localhost:8080/admin

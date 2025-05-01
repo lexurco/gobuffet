@@ -1,0 +1,108 @@
+.items {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+	.dishes {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (max-width: 629px) {
+	.dishes {
+		grid-template-columns: 1fr;
+	}
+}
+
+.item {
+	display: flex;
+	flex-flow: column;
+	margin: 1rem 0;
+}
+
+.item-title {
+	margin-top: 1rem;
+}
+
+.item-title h3 {
+	margin: 0;
+}
+
+.item img {
+	width: 100%;
+	height: 150px;
+	object-fit: cover;
+	border: 0.25rem solid black;
+	border-radius: 2rem;
+}
+
+.item input[type=number] {
+	border: none;
+	background-color: linen;
+	border-radius: 10px;
+	width: 5rem;
+}
+
+.client-details {
+	display: flex;
+	flex-flow: column;
+}
+
+.client-details label {
+	display: block;
+	font-weight: bold;
+	margin-bottom: 0.5rem;
+}
+
+.client-details > div {
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.client-details-row {
+	display: flex;
+	width: 100%;
+}
+
+.client-details-input {
+	width: 100%;
+}
+
+.client-details-input input, textarea {
+	width: 100%;
+}
+
+@media (max-width: 811px) {
+	.client-details-row {
+		flex-flow: column;
+	}
+}
+
+button[type=button] {
+	border: none;
+}
+
+button[type=button].incr {
+	color: white;
+	background-color: green;
+}
+
+button[type=button].decr {
+	color: white;
+	background-color: red;
+}
+
+button[type=submit] {
+	margin-top: 10;
+	background-color: orange;
+	border: none;
+	color: white;
+	padding: 13px;
+	width: 100%;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 18px;
+}

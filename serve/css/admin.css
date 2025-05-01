@@ -1,0 +1,25 @@
+form > div {
+	display: flex;
+	margin-bottom: 0.2rem;
+}
+
+form label {
+	margin-right: 2rem;
+}
+
+.pass-form label {
+	width: 8rem;
+}
+
+.item-form label {
+	width: 4rem;
+}
+
+.item-form img {
+	width: 150px;
+	height: 150px;
+}
+
+.currency {
+	margin-left: 0.5rem;
+}

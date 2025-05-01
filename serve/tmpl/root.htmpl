@@ -1,0 +1,129 @@
+{{- /*
+     * Copyright (c) 2025 Eneik
+     *
+     * Permission to use, copy, modify, and distribute this software for any
+     * purpose with or without fee is hereby granted, provided that the above
+     * copyright notice and this permission notice appear in all copies.
+     *
+     * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+     * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+     * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+     * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+     * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+     * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+     * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+     */ -}}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{.Title}}</title>
+	<link rel=stylesheet href=/css/main.css>
+	<link rel=stylesheet href=/css/index.css>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<div class=main>
+<header><h1>{{.Title}}</h1></header>
+<hr>
+{{if .Ordered}}<p><b>Order completed!</b></p>{{end -}}
+{{/* LF */}}
+<form action="/" method="post">
+	<div class=items>
+{{- range .Items}}
+		<article class=item>
+			{{if .Img}}<img src="{{.Img}}" alt="{{.Name}}">{{end}}
+			<div class=item-title>
+				<label><h3>{{.Name}}</h3></label>
+				{{if .Descr}}<p>({{.Descr}})</p>{{end}}
+				<input type=number value="{{.Num}}"
+					{{- if $.Checkout}} readonly{{end}} min=0 max=100 name={{.ID}} />
+				<strong>{{.Price.Str}} {{$.Currency}}</strong>
+			</div>
+		</article>
+{{- end}}
+	</div>
+{{- if .Checkout}}
+	<article>Delivery: <b>{{.Delivery.Str}} {{.Currency}}</b></article>
+	<article>Total: <b>{{.Total}} {{.Currency}}</b></article>
+{{- end}}
+	<hr>
+
+	<div class=client-details>
+		<div class=client-details-row>
+			<div class=client-details-input>
+				<label>Name*</label>
+				<input type=textfield name=name required
+					{{- if .Checkout}} readonly value="{{.Name}}"{{end}} />
+			</div>
+			<div class=client-details-input>
+				<label>Contact*</label>
+				<input type=textfield name=contact required
+					{{- if .Checkout}} readonly value="{{.Contact}}"{{end}} />
+			</div>
+		</div>
+		<div class=client-details-row>
+			<div class=client-details-input>
+				<label>Address*</label>
+				<textarea cols=100 rows=5 name=address required
+				    {{- if $.Checkout}}readonly{{end}}>
+					{{- if $.Checkout}}{{.Address}}{{end -}}
+				</textarea>
+			</div>
+			<div class=client-details-input>
+				<label>Comments?</label>
+				<textarea cols=100 rows=5 name=comments
+				    {{- if $.Checkout}}readonly{{end}}>
+					{{- if $.Checkout}}{{.Comments}}{{end -}}
+				</textarea>
+			</div>
+		</div>
+	</div>
+{{- if not .Ordered}}
+	<button type=submit name=action value={{if .Checkout}}order{{else}}checkout{{end -}}
+		>{{if .Checkout}}Order!{{else}}Checkout!{{end}}</button>
+{{- end}}
+</form>
+
+{{if .Notes -}}
+<hr>
+<ul>
+{{- range .Notes}}
+	<li>{{.}}</li>
+{{- end}}
+</ul>
+
+{{end -}}
+</div>
+{{- if not .Checkout}}
+
+<script>
+function add(b, x) {
+	const input = b.parentNode.querySelector('input');
+	if (input) {
+		input.value = Math.min(
+		    Math.max((parseInt(input.value) || 0) + x, input.min),
+		    input.max);
+	}
+}
+
+document.querySelectorAll("article div input[type='number']").forEach(input => {
+	const decr =		document.createElement("button");
+	decr.type =		"button";
+	decr.className =	"decr";
+	decr.textContent =	"-";
+	decr.onclick =		function() { add(decr, -1); };
+
+	const incr =		document.createElement("button");
+	incr.type =		"button";
+	incr.className =	"incr";
+	incr.textContent =	"+";
+	incr.onclick =		function() { add(incr, 1); };
+
+	input.insertAdjacentElement("beforebegin", decr);
+	input.insertAdjacentElement("afterend", incr);
+});
+</script>
+{{- end}}
+</body>
+</html>
