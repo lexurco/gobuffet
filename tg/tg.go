@@ -20,8 +20,8 @@ import (
 	"math"
 	"os"
 
-	tutil "gobuffet/tg/util"
-	"gobuffet/util"
+	tutil "github.com/lexurco/gobuffet/tg/util"
+	"github.com/lexurco/gobuffet/util"
 )
 
 var flags = flag.NewFlagSet(os.Args[0]+" tg", flag.ExitOnError)

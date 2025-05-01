@@ -42,10 +42,10 @@ import (
 
 	"github.com/jackc/pgx"
 
-	iutil "gobuffet/item/util"
-	putil "gobuffet/pw/util"
-	tutil "gobuffet/tg/util"
-	"gobuffet/util"
+	iutil "github.com/lexurco/gobuffet/item/util"
+	putil "github.com/lexurco/gobuffet/pw/util"
+	tutil "github.com/lexurco/gobuffet/tg/util"
+	"github.com/lexurco/gobuffet/util"
 )
 
 type price struct {

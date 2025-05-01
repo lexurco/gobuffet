@@ -24,7 +24,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gobuffet/util"
+	"github.com/lexurco/gobuffet/util"
 )
 
 type Conf struct {

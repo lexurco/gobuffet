@@ -27,7 +27,7 @@ import (
 
 	"github.com/jackc/pgx"
 
-	"gobuffet/util"
+	"github.com/lexurco/gobuffet/util"
 )
 
 type Item struct {

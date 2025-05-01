@@ -1,4 +1,4 @@
-module gobuffet
+module github.com/lexurco/gobuffet
 
 go 1.23.3
 

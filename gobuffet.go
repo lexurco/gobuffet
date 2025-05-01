@@ -18,11 +18,11 @@ import (
 	"fmt"
 	"os"
 
-	"gobuffet/item"
-	"gobuffet/pw"
-	"gobuffet/serve"
-	"gobuffet/tg"
-	"gobuffet/util"
+	"github.com/lexurco/gobuffet/item"
+	"github.com/lexurco/gobuffet/pw"
+	"github.com/lexurco/gobuffet/serve"
+	"github.com/lexurco/gobuffet/tg"
+	"github.com/lexurco/gobuffet/util"
 )
 
 func main() {

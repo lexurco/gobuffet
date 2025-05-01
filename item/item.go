@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"os"
 
-	iutil "gobuffet/item/util"
-	"gobuffet/util"
+	iutil "github.com/lexurco/gobuffet/item/util"
+	"github.com/lexurco/gobuffet/util"
 )
 
 var (

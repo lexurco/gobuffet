@@ -23,8 +23,8 @@ import (
 
 	"golang.org/x/term"
 
-	putil "gobuffet/pw/util"
-	"gobuffet/util"
+	putil "github.com/lexurco/gobuffet/pw/util"
+	"github.com/lexurco/gobuffet/util"
 )
 
 var flags = flag.NewFlagSet("pw", flag.ExitOnError)
