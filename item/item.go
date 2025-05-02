@@ -29,7 +29,7 @@ var (
 	dbFlag = flags.String("db", "",
 		"database connection string or URI (environment is used if empty)")
 
-	addFlags = flag.NewFlagSet("item add", flag.ExitOnError)
+	addFlags = flag.NewFlagSet(os.Args[0] + " item add", flag.ExitOnError)
 	descrAddFlag, imgAddFlag string
 	idAddFlag int
 	priceAddFlag iutil.Price = 0

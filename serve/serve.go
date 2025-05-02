@@ -69,7 +69,7 @@ type item struct {
 var (
 	errLog = log.New(os.Stderr, "", log.LstdFlags)
 
-	flags     = flag.NewFlagSet("serve", flag.ExitOnError)
+	flags     = flag.NewFlagSet(os.Args[0] + " serve", flag.ExitOnError)
 	dbFlag    = flags.String("db", "", "database connection string or URI")
 	tokenFlag = flags.String("token", "", "telegram bot API token")
 	chatFlag  = flags.Int("chat", math.MaxInt, "telegram bot chat ID")

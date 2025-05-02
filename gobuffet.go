@@ -15,7 +15,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/lexurco/gobuffet/item"
@@ -27,8 +26,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, "usage: rockbuffet subcommand [arg ...]")
-		os.Exit(2)
+		util.Die("usage: " + os.Args[0] + " subcommand [arg ...]")
 	}
 
 	switch os.Args[1] {

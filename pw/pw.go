@@ -28,7 +28,7 @@ import (
 	"github.com/lexurco/gobuffet/util"
 )
 
-var flags = flag.NewFlagSet("pw", flag.ExitOnError)
+var flags = flag.NewFlagSet(os.Args[0] + " pw", flag.ExitOnError)
 var dbFlag = flags.String("db", "", "database connection string or URI")
 
 func pwGet() (pass []byte, err error) {
@@ -51,10 +51,6 @@ func Pw(args []string) {
 	var pass []byte
 	var err error
 
-	flags.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: rockbuffet pw [-db connstr] [password]")
-		flags.PrintDefaults()
-	}
 	flags.Parse(args[1:])
 	args = flags.Args()
 
@@ -64,7 +60,7 @@ func Pw(args []string) {
 	case 1:
 		pass = []byte(args[0])
 	default:
-		flags.Usage()
+		util.Die("usage: " + os.Args[0] + " pw [options ...] [password]")
 	}
 
 	db, err := util.DBConnect(*dbFlag)
