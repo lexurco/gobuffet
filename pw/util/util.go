@@ -15,9 +15,11 @@
 package util
 
 import (
+	"context"
+
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v5"
 )
 
 func Chpass(db *pgx.Conn, pass []byte) (err error) {
@@ -29,7 +31,8 @@ func Chpass(db *pgx.Conn, pass []byte) (err error) {
 		return err
 	}
 
-	_, err = db.Exec(`INSERT INTO passwd (name, pass)
+	_, err = db.Exec(context.Background(),
+		`INSERT INTO passwd (name, pass)
 		VALUES ('admin', $1) ON CONFLICT (name) DO UPDATE
 		SET pass = EXCLUDED.pass`, hash)
 	if err != nil {

@@ -16,6 +16,7 @@ package serve
 
 import (
 	"bytes"
+	"context"
 	"embed"
 	"errors"
 	"flag"
@@ -40,7 +41,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v5"
 
 	iutil "github.com/lexurco/gobuffet/item/util"
 	putil "github.com/lexurco/gobuffet/pw/util"
@@ -338,8 +339,9 @@ func auth(w http.ResponseWriter, r *http.Request) (code int, err error) {
 			errors.New("empty password login denied for " + u)
 	}
 
-	q := "SELECT pass FROM passwd WHERE name = $1"
-	if err := dbConn.QueryRow(q, u).Scan(&hash); err != nil {
+	err = dbConn.QueryRow(context.Background(), "SELECT pass FROM passwd WHERE name = $1",
+		u).Scan(&hash)
+	if err != nil {
 		if err == pgx.ErrNoRows {
 			setAuthHeader(w)
 			return http.StatusUnauthorized, nil

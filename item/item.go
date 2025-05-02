@@ -16,6 +16,7 @@ package item
 
 import (
 	"flag"
+	"context"
 	"fmt"
 	"os"
 
@@ -96,7 +97,7 @@ func cmdAdd(args []string) {
 	if err != nil {
 		util.Die(err)
 	}
-	defer db.Close()
+	defer db.Close(context.Background())
 
 	if err = iutil.Add(db, &it); err != nil {
 		util.Die(err)
@@ -123,7 +124,7 @@ func cmdDel(args []string) {
 	if err != nil {
 		util.Die(err)
 	}
-	defer db.Close()
+	defer db.Close(context.Background())
 
 	if err := iutil.Del(db, ids, names); err != nil {
 		util.Die(err)
@@ -181,7 +182,7 @@ func cmdMod(args []string) {
 	if err != nil {
 		util.Die(err)
 	}
-	defer db.Close()
+	defer db.Close(context.Background())
 
 	iutil.Mod(db, id, name, &it)
 }
@@ -206,7 +207,7 @@ func cmdShow(args []string) {
 	if err != nil {
 		util.Die(err)
 	}
-	defer db.Close()
+	defer db.Close(context.Background())
 
 	items, err := iutil.Get(db, ids, names, iutil.ByID)
 	if err != nil {

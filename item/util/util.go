@@ -15,6 +15,7 @@
 package util
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -25,7 +26,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v5"
 
 	"github.com/lexurco/gobuffet/util"
 )
@@ -68,9 +69,9 @@ func (p *Price) String() (s string) {
 
 	s = strconv.Itoa(n)
 	switch {
-	case n < 10 :
+	case n < 10:
 		s = "0.0" + s
-	case n < 100 :
+	case n < 100:
 		s = "0." + s
 	default:
 		s = s[:len(s)-2] + "." + s[len(s)-2:]
@@ -141,7 +142,7 @@ func Add(db *pgx.Conn, it *Item) (err error) {
 	if it.Descr != nil {
 		addArg("descr", it.Descr)
 	}
-	_, err = db.Exec(fmt.Sprintf("INSERT INTO items (%v) VALUES (%v)",
+	_, err = db.Exec(context.Background(), fmt.Sprintf("INSERT INTO items (%v) VALUES (%v)",
 		strings.Join(cols, ","), strings.Join(vals, ",")), args...)
 	if err != nil {
 		if img != "" {
@@ -173,14 +174,14 @@ func Del(db *pgx.Conn, ids []int, names []string) (err error) {
 		newArg("name", n)
 	}
 
-	tx, err := db.Begin()
+	tx, err := db.Begin(context.Background())
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer tx.Rollback(context.Background())
 
 	wheres := strings.Join(where, " OR ")
-	rows, err := tx.Query("SELECT img FROM items WHERE "+wheres, args...)
+	rows, err := tx.Query(context.Background(), "SELECT img FROM items WHERE "+wheres, args...)
 	if err != nil && err != pgx.ErrNoRows {
 		return err
 	}
@@ -193,11 +194,11 @@ func Del(db *pgx.Conn, ids []int, names []string) (err error) {
 			imgs = append(imgs, util.ImgPath(*p))
 		}
 	}
-	_, err = tx.Exec("DELETE FROM items WHERE "+wheres, args...)
+	_, err = tx.Exec(context.Background(), "DELETE FROM items WHERE "+wheres, args...)
 	if err != nil {
 		return err
 	}
-	tx.Commit()
+	tx.Commit(context.Background())
 
 	for _, v := range imgs {
 		os.Remove(v)
@@ -208,12 +209,12 @@ func Del(db *pgx.Conn, ids []int, names []string) (err error) {
 
 func Mod(db *pgx.Conn, id int, name string, it *Item) (err error) {
 	var where, img, newImg, newImgPath string
-	var set                            []string
-	var args                           []any
-	var whereArg                       any
+	var set []string
+	var args []any
+	var whereArg any
 
 	newArg := func(fld string, arg any) {
-		set = append(set, fmt.Sprintf("%v = $%v", fld, len(set) + 1))
+		set = append(set, fmt.Sprintf("%v = $%v", fld, len(set)+1))
 		args = append(args, arg)
 	}
 
@@ -257,36 +258,36 @@ func Mod(db *pgx.Conn, id int, name string, it *Item) (err error) {
 	}
 
 	if id >= 0 {
-		where = fmt.Sprintf("id = $%v", len(set) + 1)
+		where = fmt.Sprintf("id = $%v", len(set)+1)
 		whereArg = id
 	} else {
-		where = fmt.Sprintf("name = $%v", len(set) + 1)
+		where = fmt.Sprintf("name = $%v", len(set)+1)
 		whereArg = name
 	}
 	args = append(args, whereArg)
 
-	tx, err := db.Begin()
+	tx, err := db.Begin(context.Background())
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer tx.Rollback(context.Background())
 
 	if it.Img.Name != nil {
-		if err := tx.QueryRow("SELECT img FROM items WHERE "+where, whereArg).
-			Scan(&img); err != nil && err != pgx.ErrNoRows {
-
+		err := tx.QueryRow(context.Background(),
+			"SELECT img FROM items WHERE "+where, whereArg).Scan(&img)
+		if err != nil && err != pgx.ErrNoRows {
 			rmImg()
 			return err
 		}
 	}
 
-	if _, err := tx.Exec(fmt.Sprintf("UPDATE items SET %v WHERE %v",
+	if _, err := tx.Exec(context.Background(), fmt.Sprintf("UPDATE items SET %v WHERE %v",
 		strings.Join(set, ","), where), args...); err != nil {
 
 		rmImg()
 		return err
 	}
-	tx.Commit()
+	tx.Commit(context.Background())
 
 	if img != "" {
 		os.Remove(util.ImgPath(img))
@@ -296,6 +297,7 @@ func Mod(db *pgx.Conn, id int, name string, it *Item) (err error) {
 }
 
 type Order int
+
 const (
 	ByID Order = iota
 	ByName
@@ -332,7 +334,8 @@ func Get(db *pgx.Conn, ids []int, names []string, ord Order) (items []Item, err 
 		orderBy = "ORDER BY " + orderBy
 	}
 
-	rows, err := db.Query(sql+" "+strings.Join(where, " OR ")+" "+orderBy, args...)
+	rows, err := db.Query(context.Background(), sql+" "+strings.Join(where, " OR ")+" "+orderBy,
+		args...)
 	if err != nil && err != pgx.ErrNoRows {
 		return items, err
 	}

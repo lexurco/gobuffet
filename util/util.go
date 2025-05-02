@@ -22,12 +22,11 @@ import (
 	"mime/multipart"
 	"os"
 	"path"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v5"
 )
 
 func Die(a ...any) {
@@ -53,26 +52,9 @@ func DBTest(conn *pgx.Conn) (err error) {
 }
 
 func DBConnect(s string) (conn *pgx.Conn, err error) {
-	// set default connection parameters as in libpq
-	if os.Getenv("PGHOST") == "" && runtime.GOOS != "windows" {
-		os.Setenv("PGHOST", "/tmp")
-	}
-
-	var conf pgx.ConnConfig
-	if s == "" {
-		conf, err = pgx.ParseEnvLibpq()
-	} else {
-		conf, err = pgx.ParseConnectionString(s)
-	}
-	if err != nil {
+	if conn, err = pgx.Connect(context.Background(), s); err != nil {
 		return nil, err
 	}
-
-	conn, err = pgx.Connect(conf)
-	if err != nil {
-		return nil, err
-	}
-
 	return conn, nil
 }
 
@@ -121,7 +103,7 @@ func ItemAdd(db *pgx.Conn, i *Item) (err error) {
 		vals = append(vals, fmt.Sprintf("$%v", len(cols)))
 		args = append(args, i.Descr)
 	}
-	_, err = db.Exec(fmt.Sprintf("INSERT INTO items (%v) VALUES (%v)",
+	_, err = db.Exec(context.Background(), fmt.Sprintf("INSERT INTO items (%v) VALUES (%v)",
 		strings.Join(cols, ","), strings.Join(vals, ",")), args...)
 	if err != nil {
 		if img != "" {
@@ -191,7 +173,7 @@ func ItemMod(db *pgx.Conn, item string, i *Item) (err error) {
 		return nil
 	}
 	args = append(args, cond)
-	_, err = db.Exec(fmt.Sprintf("UPDATE items SET %v WHERE %v = $%v",
+	_, err = db.Exec(context.Background(), fmt.Sprintf("UPDATE items SET %v WHERE %v = $%v",
 		strings.Join(sets, ","), fld, len(sets) + 1), args...)
 	if err != nil {
 		if img != "" {
@@ -220,22 +202,22 @@ func ItemDel(db *pgx.Conn, item string, useName bool) (err error) {
 		}
 	}
 
-	tx, err := db.Begin()
+	tx, err := db.Begin(context.Background())
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer tx.Rollback(context.Background())
 
-	if err = tx.QueryRow("SELECT img FROM items WHERE "+fld+" = $1", arg).
+	if err = tx.QueryRow(context.Background(), "SELECT img FROM items WHERE "+fld+" = $1", arg).
 		Scan(&img); err != nil && err != pgx.ErrNoRows {
 
 		return err
 	}
-	_, err = tx.Exec("DELETE FROM items WHERE "+fld+" = $1", arg)
+	_, err = tx.Exec(context.Background(), "DELETE FROM items WHERE "+fld+" = $1", arg)
 	if err != nil {
 		return err
 	}
-	tx.Commit()
+	tx.Commit(context.Background())
 
 	if img != nil {
 		os.Remove(ImgPath(*img))
@@ -245,7 +227,7 @@ func ItemDel(db *pgx.Conn, item string, useName bool) (err error) {
 }
 
 func ItemLs(db *pgx.Conn) (err error) {
-	rows, err := db.Query("SELECT id, name, descr, price, img FROM items")
+	rows, err := db.Query(context.Background(), "SELECT id, name, descr, price, img FROM items")
 	if err != nil && err != pgx.ErrNoRows {
 		return err
 	}

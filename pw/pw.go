@@ -17,6 +17,7 @@ package pw
 import (
 	"errors"
 	"fmt"
+	"context"
 	"flag"
 	"os"
 	"syscall"
@@ -70,7 +71,7 @@ func Pw(args []string) {
 	if err != nil {
 		util.Die(err)
 	}
-	defer db.Close()
+	defer db.Close(context.Background())
 
 	if len(pass) == 0 {
 		if pass, err = pwGet(); err != nil {
