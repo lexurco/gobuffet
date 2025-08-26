@@ -641,7 +641,9 @@ func Serve(args []string) {
 		}
 	}
 
+	um := syscall.Umask(0000)
 	listener, err := net.Listen(network, addr)
+	syscall.Umask(um)
 	if err != nil {
 		errLog.Fatal(err)
 	}
