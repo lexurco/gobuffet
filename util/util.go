@@ -107,7 +107,7 @@ func ItemAdd(db *pgx.Conn, i *Item) (err error) {
 		strings.Join(cols, ","), strings.Join(vals, ",")), args...)
 	if err != nil {
 		if img != "" {
-			os.Remove(imgPath) // XXX log error here
+			os.Remove(imgPath)
 		}
 		return err
 	}

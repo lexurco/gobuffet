@@ -51,7 +51,7 @@ func (p *Price) Set(s string) (err error) {
 	if match == nil {
 		return errors.New("invalid price")
 	}
-	subprice := strings.Replace(match[2], ".", "", 1) // XXX redo these
+	subprice := strings.Replace(match[2], ".", "", 1)
 	subprice += strings.Repeat("0", 2-len(subprice))
 	n, err := strconv.Atoi(match[1] + subprice)
 	if err != nil {
